@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useContext } from "react";
 import { useRouter } from "next/router";
 import data from "../../utils/data";
 import Layout from "../../components/layout";
@@ -16,12 +16,24 @@ import useStyles from "../../utils/styles";
 import Image from "next/image";
 import Product from "../../models/product";
 import db from "../../utils/db";
+import axios from "axios";
+import { Store } from "../../utils/Store";
 
 export default function ProductScreen(props) {
+  const { dispatch } = useContext(Store)
   const { product } = props;
   const classes = useStyles();
   if (!product) {
     return <div>Product Not Found</div>;
+  }
+
+  const addToCartHandler = async () => {
+    const { data } = await axios.get(`/api/products/${product._id}`);
+    if(data.countInStoke <= 0) {
+      window.alert('Sorry this item is not in stock');
+      return;
+    }
+    dispatch({ type: 'CART_ADD_ITEM', payload: {...product, quantity: 1 }}) 
   }
   return (
     <>
@@ -88,7 +100,7 @@ export default function ProductScreen(props) {
                     </Grid>
                   </Grid>
                 </ListItem>
-                <Button fullWidth variant="contained" color="primary">
+                <Button fullWidth variant="contained" color="primary" onClick={addToCartHandler}>
                   Add to cart
                 </Button>
               </List>
