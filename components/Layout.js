@@ -7,53 +7,52 @@ import {
   ThemeProvider,
   CssBaseline,
   Switch,
+  Badge,
 } from "@material-ui/core";
 import Head from "next/head";
 import React, { useContext } from "react";
 import useStyles from "../utils/styles";
 import NextLink from "next/link";
-import { createTheme } from '@material-ui/core/styles';
+import { createTheme } from "@material-ui/core/styles";
 import { Store } from "../utils/Store";
 import Cookies from "js-cookie";
 
-
 export default function Layout({ title, children, description }) {
   const { state, dispatch } = useContext(Store);
-  const { darkMode } = state;
+  const { darkMode, cart } = state;
   const theme = createTheme({
     typography: {
       h1: {
-        fontSize: '1.6rem',
+        fontSize: "1.6rem",
         fontWeight: 400,
-        margin: '1rem 0'
+        margin: "1rem 0",
       },
       h2: {
-        fontSize: '1.4rem',
+        fontSize: "1.4rem",
         fontWeight: 400,
-        margin: '1rem 0'
+        margin: "1rem 0",
       },
       body1: {
-        fontWeight: 'normal',
+        fontWeight: "normal",
       },
-      
     },
     palette: {
-      type: darkMode ? 'dark' : 'light',
+      type: darkMode ? "dark" : "light",
       primary: {
-        main: '#f0c000'
+        main: "#f0c000",
       },
       secondary: {
-        main: '#208080'
-      }
-    }
+        main: "#208080",
+      },
+    },
   });
   const classes = useStyles();
 
   const darkModeChangeHandler = () => {
-    dispatch({type: darkMode ? 'DARK_MODE_OFF' : 'DARK_MODE_ON'})
+    dispatch({ type: darkMode ? "DARK_MODE_OFF" : "DARK_MODE_ON" });
     const newDarkMode = !darkMode;
-    Cookies.set('darkMode', newDarkMode ? 'ON' : 'OFF')
-  }
+    Cookies.set("darkMode", newDarkMode ? "ON" : "OFF");
+  };
 
   return (
     <div>
@@ -62,32 +61,46 @@ export default function Layout({ title, children, description }) {
         {description && <meta name="description" content={description}></meta>}
       </Head>
       <ThemeProvider theme={theme}>
-        <CssBaseline/>
-      <AppBar position="static" className={classes.navbar}>
-        <Toolbar>
-          <NextLink href="/" passHref>
-            <Link>
-              <Typography sx={{ color: "white" }} className={classes.brand}>
-                amazona
-              </Typography>
-            </Link>
-          </NextLink>
-          <div className={classes.grow}></div>
-          <div>
-            <Switch checked={darkMode} onChange={darkModeChangeHandler}></Switch>
-            <NextLink href="/cart" passHref>
-              <Link className={classes.cart}>Cart</Link>
+        <CssBaseline />
+        <AppBar position="static" className={classes.navbar}>
+          <Toolbar>
+            <NextLink href="/" passHref>
+              <Link>
+                <Typography sx={{ color: "white" }} className={classes.brand}>
+                  amazona
+                </Typography>
+              </Link>
             </NextLink>
-            <NextLink href="/login" passHref>
-              <Link className={classes.login}>Login</Link>
-            </NextLink>
-          </div>
-        </Toolbar>
-      </AppBar>
-      <Container className={classes.main}>{children}</Container>
-      <div className={classes.footer}>
-        <Typography>All rights reserved. Next Amazona.</Typography>
-      </div>
+            <div className={classes.grow}></div>
+            <div>
+              <Switch
+                checked={darkMode}
+                onChange={darkModeChangeHandler}
+              ></Switch>
+              <NextLink href="/cart" passHref>
+                <Link className={classes.cart}>
+                  {cart.cartItems.length > 0 ? (
+                    <Badge
+                      color="secondary"
+                      badgeContent={cart.cartItems.length}
+                    >
+                      Cart
+                    </Badge>
+                  ) : (
+                    "Cart"
+                  )}
+                </Link>
+              </NextLink>
+              <NextLink href="/login" passHref>
+                <Link className={classes.login}>Login</Link>
+              </NextLink>
+            </div>
+          </Toolbar>
+        </AppBar>
+        <Container className={classes.main}>{children}</Container>
+        <div className={classes.footer}>
+          <Typography>All rights reserved. Next Amazona.</Typography>
+        </div>
       </ThemeProvider>
     </div>
   );
